@@ -32,7 +32,7 @@ use crate::validate;
 #[account(zero_copy(unsafe))]
 #[derive(PartialEq, Eq, Debug)]
 #[repr(C)]
-#[repr(align(8))] 
+#[repr(align(8))]
 pub struct SpotMarket {
     /// The address of the spot market. It is a pda of the market index
     pub pubkey: Pubkey,

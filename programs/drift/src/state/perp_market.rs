@@ -737,7 +737,6 @@ impl SpotBalance for PoolBalance {
     }
 }
 
-
 #[assert_no_slop]
 #[zero_copy(unsafe)]
 #[derive(Debug, PartialEq, Eq)]

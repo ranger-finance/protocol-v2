@@ -350,32 +350,32 @@ pub fn place_perp_order(
     let (taker, taker_order, maker, maker_order) =
         get_taker_and_maker_for_order_record(&user_key, &new_order);
 
-        let order_action_record = get_order_action_record(
-            now,
-            OrderAction::Place,
-            options.explanation,
-            market_index,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            taker,
-            taker_order,
-            maker,
-            maker_order,
-            0,
-            0,
-            None,
-            None,
-            None,
-            None,
-        )?;
+    let order_action_record = get_order_action_record(
+        now,
+        OrderAction::Place,
+        options.explanation,
+        market_index,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        taker,
+        taker_order,
+        maker,
+        maker_order,
+        0,
+        0,
+        None,
+        None,
+        None,
+        None,
+    )?;
     emit_stack::<_, { OrderActionRecord::SIZE }>(order_action_record)?;
 
     let order_record = OrderRecord {

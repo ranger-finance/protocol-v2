@@ -1642,4 +1642,5 @@ pub enum MarginMode {
     #[default]
     Default,
     HighLeverage,
+    HighLeverageMaintenance,
 }
