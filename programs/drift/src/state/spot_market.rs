@@ -205,7 +205,7 @@ pub struct SpotMarket {
     /// fuel multiplier for spot insurance stake
     /// precision: 10
     pub fuel_boost_insurance: u8,
-    pub token_program: u8,
+    pub token_program_flag: u8,
     pub pool_id: u8,
     pub padding: [u8; 40],
 }
@@ -274,7 +274,7 @@ impl Default for SpotMarket {
             fuel_boost_taker: 0,
             fuel_boost_maker: 0,
             fuel_boost_insurance: 0,
-            token_program: 0,
+            token_program_flag: 0,
             pool_id: 0,
             padding: [0; 40],
         }

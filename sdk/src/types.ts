@@ -576,6 +576,7 @@ export type StateAccount = {
 	initialPctToLiquidate: number;
 	liquidationDuration: number;
 	maxInitializeUserFee: number;
+	featureBitFlags: number;
 };
 
 export type PerpMarketAccount = {
@@ -613,6 +614,7 @@ export type PerpMarketAccount = {
 	quoteSpotMarketIndex: number;
 	feeAdjustment: number;
 	pausedOperations: number;
+	lastFillPrice: BN;
 };
 
 export type HistoricalOracleData = {
@@ -694,8 +696,8 @@ export type SpotMarketAccount = {
 	orderStepSize: BN;
 	orderTickSize: BN;
 	minOrderSize: BN;
-	maxPositionSize: BN;
-	nextFillRecordId: BN;
+	mmOracleSlot: BN;
+	mmOracleSequenceId: BN;
 	spotFeePool: PoolBalance;
 	totalSpotFee: BN;
 	totalSwapFee: BN;
@@ -739,12 +741,12 @@ export type AMM = {
 	last24HAvgFundingRate: BN;
 	lastFundingRateShort: BN;
 	lastFundingRateLong: BN;
-
+	mmOraclePrice: BN;
+	lastFundingOracleTwap: BN;
 	totalLiquidationFee: BN;
 	totalFeeMinusDistributions: BN;
 	totalFeeWithdrawn: BN;
 	totalFee: BN;
-	totalFeeEarnedPerLp: BN;
 	userLpShares: BN;
 	baseAssetAmountWithUnsettledLp: BN;
 	orderStepSize: BN;
@@ -789,13 +791,12 @@ export type AMM = {
 
 	markStd: BN;
 	oracleStd: BN;
-	longIntensityCount: number;
 	longIntensityVolume: BN;
-	shortIntensityCount: number;
 	shortIntensityVolume: BN;
 	volume24H: BN;
 	minOrderSize: BN;
-	maxPositionSize: BN;
+	mmOracleSlot: BN;
+	mmOracleSequenceId: BN;
 
 	bidBaseAssetReserve: BN;
 	bidQuoteAssetReserve: BN;

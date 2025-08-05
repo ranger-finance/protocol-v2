@@ -237,7 +237,9 @@ pub struct PerpMarket {
     pub high_leverage_margin_ratio_maintenance: u16,
     pub protected_maker_limit_price_divisor: u8,
     pub protected_maker_dynamic_divisor: u8,
-    pub padding: [u8; 36],
+    pub padding1: u32,
+    pub last_fill_price: u64,
+    pub padding: [u8; 24],
 }
 
 impl Default for PerpMarket {
@@ -279,7 +281,9 @@ impl Default for PerpMarket {
             high_leverage_margin_ratio_maintenance: 0,
             protected_maker_limit_price_divisor: 0,
             protected_maker_dynamic_divisor: 0,
-            padding: [0; 36],
+            padding1: 0,
+            last_fill_price: 0,
+            padding: [0; 24],
         }
     }
 }
@@ -818,17 +822,21 @@ pub struct AMM {
     /// precision: AMM_RESERVE_PRECISION
     pub user_lp_shares: u128,
     /// last funding rate in this perp market (unit is quote per base)
-    /// precision: QUOTE_PRECISION
+    /// precision: FUNDING_RATE_PRECISION
     pub last_funding_rate: i64,
     /// last funding rate for longs in this perp market (unit is quote per base)
-    /// precision: QUOTE_PRECISION
+    /// precision: FUNDING_RATE_PRECISION
     pub last_funding_rate_long: i64,
     /// last funding rate for shorts in this perp market (unit is quote per base)
-    /// precision: QUOTE_PRECISION
+    /// precision: FUNDING_RATE_PRECISION
     pub last_funding_rate_short: i64,
     /// estimate of last 24h of funding rate perp market (unit is quote per base)
     /// precision: QUOTE_PRECISION
     pub last_24h_avg_funding_rate: i64,
+    /// MM oracle price
+    pub mm_oracle_price: i64,
+    /// last funding oracle twap
+    pub last_funding_oracle_twap: i64,
     /// total fees collected by this perp market
     /// precision: QUOTE_PRECISION
     pub total_fee: i128,
@@ -904,7 +912,8 @@ pub struct AMM {
     pub min_order_size: u64,
     /// the max base size a single user can have
     /// precision: BASE_PRECISION
-    pub max_position_size: u64,
+    pub mm_oracle_slot: u64,
+    pub mm_oracle_sequence_id: u64,
     /// estimated total of volume in market
     /// QUOTE_PRECISION
     pub volume_24h: u64,
@@ -930,10 +939,6 @@ pub struct AMM {
     pub long_spread: u32,
     /// the spread for bids vs the reserve price
     pub short_spread: u32,
-    /// the count intensity of long fills against AMM
-    pub long_intensity_count: u32,
-    /// the count intensity of short fills against AMM
-    pub short_intensity_count: u32,
     /// the fraction of total available liquidity a single fill on the AMM can consume
     pub max_fill_reserve_fraction: u16,
     /// the maximum slippage a single fill on the AMM can push
@@ -958,13 +963,12 @@ pub struct AMM {
     /// signed scale amm_spread similar to fee_adjustment logic (-100 = 0, 100 = double)
     pub amm_spread_adjustment: i8,
     pub oracle_slot_delay_override: i8,
-    pub total_fee_earned_per_lp: u64,
     pub net_unsettled_funding_pnl: i64,
     pub quote_asset_amount_with_unsettled_lp: i64,
     pub reference_price_offset: i32,
     /// signed scale amm_spread similar to fee_adjustment logic (-100 = 0, 100 = double)
     pub amm_inventory_spread_adjustment: i8,
-    pub padding: [u8; 11],
+    pub padding: [u8; 3],
 }
 
 impl Default for AMM {
@@ -998,6 +1002,8 @@ impl Default for AMM {
             last_funding_rate_long: 0,
             last_funding_rate_short: 0,
             last_24h_avg_funding_rate: 0,
+            mm_oracle_price: 0,
+            last_funding_oracle_twap: 0,
             total_fee: 0,
             total_mm_fee: 0,
             total_exchange_fee: 0,
@@ -1025,7 +1031,8 @@ impl Default for AMM {
             order_step_size: 0,
             order_tick_size: 0,
             min_order_size: 1,
-            max_position_size: 0,
+            mm_oracle_slot: 0,
+            mm_oracle_sequence_id: 0,
             volume_24h: 0,
             long_intensity_volume: 0,
             short_intensity_volume: 0,
@@ -1037,8 +1044,6 @@ impl Default for AMM {
             max_spread: 0,
             long_spread: 0,
             short_spread: 0,
-            long_intensity_count: 0,
-            short_intensity_count: 0,
             max_fill_reserve_fraction: 0,
             max_slippage_ratio: 0,
             curve_update_intensity: 0,
@@ -1050,12 +1055,11 @@ impl Default for AMM {
             taker_speed_bump_override: 0,
             amm_spread_adjustment: 0,
             oracle_slot_delay_override: 0,
-            total_fee_earned_per_lp: 0,
             net_unsettled_funding_pnl: 0,
             quote_asset_amount_with_unsettled_lp: 0,
             reference_price_offset: 0,
             amm_inventory_spread_adjustment: 0,
-            padding: [0; 11],
+            padding: [0; 3],
         }
     }
 }

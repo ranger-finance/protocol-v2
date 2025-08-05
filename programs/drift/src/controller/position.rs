@@ -436,10 +436,10 @@ pub fn update_lp_market_position(
         .safe_add(-per_lp_delta_quote)?;
 
     // track total fee earned by lps (to attribute breakdown of IL)
-    market.amm.total_fee_earned_per_lp = market
-        .amm
-        .total_fee_earned_per_lp
-        .saturating_add(per_lp_fee.cast()?);
+    // market.amm.total_fee_earned_per_lp = market
+    //     .amm
+    //     .total_fee_earned_per_lp
+    //     .saturating_add(per_lp_fee.cast()?);
 
     // update per lp position
     market.amm.quote_asset_amount_per_lp =

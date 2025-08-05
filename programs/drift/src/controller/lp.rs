@@ -50,10 +50,10 @@ pub fn apply_lp_rebase_to_perp_market(
             .quote_asset_amount_per_lp
             .safe_mul(rebase_divisor)?;
 
-        perp_market.amm.total_fee_earned_per_lp = perp_market
-            .amm
-            .total_fee_earned_per_lp
-            .safe_mul(rebase_divisor.cast()?)?;
+        // perp_market.amm.total_fee_earned_per_lp = perp_market
+        //     .amm
+        //     .total_fee_earned_per_lp
+        //     .safe_mul(rebase_divisor.cast()?)?;
     } else {
         perp_market.amm.base_asset_amount_per_lp = perp_market
             .amm
@@ -65,10 +65,10 @@ pub fn apply_lp_rebase_to_perp_market(
             .quote_asset_amount_per_lp
             .safe_div(rebase_divisor)?;
 
-        perp_market.amm.total_fee_earned_per_lp = perp_market
-            .amm
-            .total_fee_earned_per_lp
-            .safe_div(rebase_divisor.cast()?)?;
+        // perp_market.amm.total_fee_earned_per_lp = perp_market
+        //     .amm
+        //     .total_fee_earned_per_lp
+        //     .safe_div(rebase_divisor.cast()?)?;
     }
 
     msg!(
