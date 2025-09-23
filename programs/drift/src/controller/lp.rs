@@ -189,7 +189,6 @@ pub fn settle_lp_position(
     let position_delta = PositionDelta {
         base_asset_amount: lp_metrics.base_asset_amount.cast()?,
         quote_asset_amount: lp_metrics.quote_asset_amount.cast()?,
-        remainder_base_asset_amount: Some(lp_metrics.remainder_base_asset_amount.cast::<i64>()?),
     };
 
     let pnl: i64 = update_position_and_market(position, market, &position_delta)?;
@@ -251,63 +250,7 @@ pub fn burn_lp_shares(
     oracle_price: i64,
 ) -> DriftResult<(PositionDelta, i64)> {
     // settle
-    let (mut position_delta, mut pnl) = settle_lp_position(position, market)?;
-
-    // clean up
-    let unsettled_remainder = market
-        .amm
-        .base_asset_amount_with_unsettled_lp
-        .safe_add(position.remainder_base_asset_amount.cast()?)?;
-    if shares_to_burn as u128 == market.amm.user_lp_shares && unsettled_remainder != 0 {
-        crate::validate!(
-            unsettled_remainder.unsigned_abs() <= market.amm.order_step_size as u128,
-            ErrorCode::UnableToBurnLPTokens,
-            "unsettled baa on final burn too big rel to stepsize {}: {} (remainder:{})",
-            market.amm.order_step_size,
-            market.amm.base_asset_amount_with_unsettled_lp,
-            position.remainder_base_asset_amount
-        )?;
-
-        // sub bc lps take the opposite side of the user
-        position.remainder_base_asset_amount = position
-            .remainder_base_asset_amount
-            .safe_sub(unsettled_remainder.cast()?)?;
-    }
-
-    // update stats
-    if position.remainder_base_asset_amount != 0 {
-        let base_asset_amount = position.remainder_base_asset_amount as i128;
-
-        // user closes the dust
-        market.amm.base_asset_amount_with_amm = market
-            .amm
-            .base_asset_amount_with_amm
-            .safe_sub(base_asset_amount)?;
-
-        market.amm.base_asset_amount_with_unsettled_lp = market
-            .amm
-            .base_asset_amount_with_unsettled_lp
-            .safe_add(base_asset_amount)?;
-
-        position.remainder_base_asset_amount = 0;
-
-        let dust_base_asset_value = calculate_base_asset_value_with_oracle_price(base_asset_amount, oracle_price)?
-                .safe_add(1) // round up
-                ?;
-
-        update_quote_asset_amount(position, market, -dust_base_asset_value.cast()?)?;
-
-        msg!(
-            "perp {} remainder_base_asset_amount burn fee= {}",
-            position.market_index,
-            dust_base_asset_value
-        );
-
-        position_delta.quote_asset_amount = position_delta
-            .quote_asset_amount
-            .safe_sub(dust_base_asset_value.cast()?)?;
-        pnl = pnl.safe_sub(dust_base_asset_value.cast()?)?;
-    }
+    let (position_delta, pnl) = settle_lp_position(position, market)?;
 
     // update last_ metrics
     position.last_base_asset_amount_per_lp = market.amm.base_asset_amount_per_lp.cast()?;

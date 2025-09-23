@@ -748,10 +748,10 @@ pub struct PerpPosition {
     /// Updated when the user open/closes position. Excludes fees/funding
     /// precision: QUOTE_PRECISION
     pub quote_entry_amount: i64,
-    /// The amount of open bids the user has in this perp market
+    /// The amount of non reduce only trigger orders the user has open
     /// precision: BASE_PRECISION
     pub open_bids: i64,
-    /// The amount of open asks the user has in this perp market
+    /// The amount of non reduce only trigger orders the user has open
     /// precision: BASE_PRECISION
     pub open_asks: i64,
     /// The amount of pnl settled in this market since opening the position
@@ -769,10 +769,8 @@ pub struct PerpPosition {
     /// Used to settle the users lp position
     /// precision: QUOTE_PRECISION
     pub last_quote_asset_amount_per_lp: i64,
-    /// Settling LP position can lead to a small amount of base asset being left over smaller than step size
-    /// This records that remainder so it can be settled later on
-    /// precision: BASE_PRECISION
-    pub remainder_base_asset_amount: i32,
+    pub padding: [u8; 2],
+    pub max_margin_ratio: u16,
     /// The market index for the perp market
     pub market_index: u16,
     /// The number of open orders
@@ -847,41 +845,9 @@ impl PerpPosition {
             .base_asset_amount
             .safe_add(lp_metrics.base_asset_amount.cast()?)?;
 
-        let mut quote_asset_amount = settled_position
+        let quote_asset_amount = settled_position
             .quote_asset_amount
             .safe_add(lp_metrics.quote_asset_amount.cast()?)?;
-
-        let mut new_remainder_base_asset_amount = settled_position
-            .remainder_base_asset_amount
-            .cast::<i64>()?
-            .safe_add(lp_metrics.remainder_base_asset_amount.cast()?)?;
-
-        if new_remainder_base_asset_amount.unsigned_abs() >= market.amm.order_step_size {
-            let (standardized_remainder_base_asset_amount, remainder_base_asset_amount) =
-                crate::math::orders::standardize_base_asset_amount_with_remainder_i128(
-                    new_remainder_base_asset_amount.cast()?,
-                    market.amm.order_step_size.cast()?,
-                )?;
-
-            lp_metrics.base_asset_amount = lp_metrics
-                .base_asset_amount
-                .safe_add(standardized_remainder_base_asset_amount)?;
-
-            new_remainder_base_asset_amount = remainder_base_asset_amount.cast()?;
-        } else {
-            new_remainder_base_asset_amount = new_remainder_base_asset_amount.cast()?;
-        }
-
-        // dust position in baa/qaa
-        if new_remainder_base_asset_amount != 0 {
-            let dust_base_asset_value = calculate_base_asset_value_with_oracle_price(
-                new_remainder_base_asset_amount.cast()?,
-                valuation_price,
-            )?
-            .safe_add(1)?;
-
-            quote_asset_amount = quote_asset_amount.safe_sub(dust_base_asset_value.cast()?)?;
-        }
 
         let (lp_bids, lp_asks) = calculate_lp_open_bids_asks(&settled_position, market)?;
 
@@ -980,18 +946,12 @@ impl PerpPosition {
         Ok(unrealized_pnl)
     }
 
-    pub fn get_base_asset_amount_with_remainder(&self) -> DriftResult<i128> {
-        if self.remainder_base_asset_amount != 0 {
-            self.base_asset_amount
-                .cast::<i128>()?
-                .safe_add(self.remainder_base_asset_amount.cast::<i128>()?)
-        } else {
-            self.base_asset_amount.cast::<i128>()
-        }
+    pub fn get_base_asset_amount_i128(&self) -> DriftResult<i128> {
+        self.base_asset_amount.cast::<i128>()
     }
 
-    pub fn get_base_asset_amount_with_remainder_abs(&self) -> DriftResult<i128> {
-        Ok(self.get_base_asset_amount_with_remainder()?.abs())
+    pub fn get_base_asset_amount_i128_abs(&self) -> DriftResult<i128> {
+        Ok(self.get_base_asset_amount_i128()?.abs())
     }
 
     pub fn get_claimable_pnl(&self, oracle_price: i64, pnl_pool_excess: i128) -> DriftResult<i128> {
@@ -1027,7 +987,7 @@ use crate::math::constants::{AMM_TO_QUOTE_PRECISION_RATIO_I128, PRICE_PRECISION_
 #[cfg(test)]
 impl PerpPosition {
     pub fn get_breakeven_price(&self) -> DriftResult<i128> {
-        let base_with_remainder = self.get_base_asset_amount_with_remainder()?;
+        let base_with_remainder = self.get_base_asset_amount_i128()?;
         if base_with_remainder == 0 {
             return Ok(0);
         }
@@ -1039,7 +999,7 @@ impl PerpPosition {
     }
 
     pub fn get_entry_price(&self) -> DriftResult<i128> {
-        let base_with_remainder = self.get_base_asset_amount_with_remainder()?;
+        let base_with_remainder = self.get_base_asset_amount_i128()?;
         if base_with_remainder == 0 {
             return Ok(0);
         }

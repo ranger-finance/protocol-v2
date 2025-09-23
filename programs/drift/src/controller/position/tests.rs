@@ -32,7 +32,6 @@ fn full_amm_split() {
     let delta = PositionDelta {
         base_asset_amount: 10 * BASE_PRECISION_I64,
         quote_asset_amount: -10 * BASE_PRECISION_I64,
-        remainder_base_asset_amount: None,
     };
 
     let amm = AMM {
@@ -83,7 +82,6 @@ fn amm_split_large_k() {
     let delta = PositionDelta {
         base_asset_amount: BASE_PRECISION_I64 / 10,
         quote_asset_amount: -2300000,
-        remainder_base_asset_amount: None,
     };
 
     update_lp_market_position(&mut perp_market, &delta, 0, AMMLiquiditySplit::Shared).unwrap();
@@ -95,7 +93,6 @@ fn amm_split_large_k() {
     let delta = PositionDelta {
         base_asset_amount: -BASE_PRECISION_I64 / 10,
         quote_asset_amount: 2300000,
-        remainder_base_asset_amount: None,
     };
 
     update_lp_market_position(&mut perp_market, &delta, 0, AMMLiquiditySplit::Shared).unwrap();
@@ -117,7 +114,6 @@ fn amm_split_large_k() {
     settle_lp_position(&mut existing_position, &mut perp_market).unwrap();
 
     assert_eq!(existing_position.base_asset_amount, 0);
-    assert_eq!(existing_position.remainder_base_asset_amount, 0);
     assert_eq!(existing_position.quote_asset_amount, -33538939); // out of favor rounding
 
     assert_eq!(existing_position.per_lp_base, perp_market.amm.per_lp_base);
@@ -126,7 +122,6 @@ fn amm_split_large_k() {
     let delta = PositionDelta {
         base_asset_amount: BASE_PRECISION_I64 * 10,
         quote_asset_amount: -230000000,
-        remainder_base_asset_amount: None,
     };
 
     update_lp_market_position(&mut perp_market, &delta, 0, AMMLiquiditySplit::Shared).unwrap();
@@ -157,7 +152,6 @@ fn amm_split_large_k() {
     let delta = PositionDelta {
         base_asset_amount: -BASE_PRECISION_I64 * 10,
         quote_asset_amount: 230000000,
-        remainder_base_asset_amount: None,
     };
 
     let og_baapl = perp_market.amm.base_asset_amount_per_lp;
@@ -217,7 +211,6 @@ fn amm_split_large_k_with_rebase() {
     let delta = PositionDelta {
         base_asset_amount: 0,
         quote_asset_amount: 0,
-        remainder_base_asset_amount: None,
     };
 
     update_lp_market_position(&mut perp_market, &delta, 0, AMMLiquiditySplit::Shared).unwrap();
@@ -233,7 +226,6 @@ fn amm_split_large_k_with_rebase() {
     let delta = PositionDelta {
         base_asset_amount: BASE_PRECISION_I64 / 10,
         quote_asset_amount: -2300000,
-        remainder_base_asset_amount: None,
     };
 
     let u1 =
@@ -268,7 +260,6 @@ fn amm_split_large_k_with_rebase() {
     let delta = PositionDelta {
         base_asset_amount: -BASE_PRECISION_I64 / 10,
         quote_asset_amount: 2300000,
-        remainder_base_asset_amount: None,
     };
 
     update_lp_market_position(&mut perp_market, &delta, 0, AMMLiquiditySplit::Shared).unwrap();
@@ -294,7 +285,6 @@ fn amm_split_large_k_with_rebase() {
     settle_lp_position(&mut existing_position, &mut perp_market).unwrap();
 
     assert_eq!(existing_position.base_asset_amount, 0);
-    assert_eq!(existing_position.remainder_base_asset_amount, 0);
     assert_eq!(existing_position.quote_asset_amount, -335); // out of favor rounding... :/
 
     assert_eq!(existing_position.per_lp_base, perp_market.amm.per_lp_base);
@@ -316,7 +306,6 @@ fn amm_split_large_k_with_rebase() {
     let delta = PositionDelta {
         base_asset_amount: 0,
         quote_asset_amount: 0,
-        remainder_base_asset_amount: None,
     };
 
     // unchanged with rebase (even when target!=0)
@@ -340,7 +329,6 @@ fn amm_split_large_k_with_rebase() {
     let delta = PositionDelta {
         base_asset_amount: BASE_PRECISION_I64,
         quote_asset_amount: -23000000,
-        remainder_base_asset_amount: None,
     };
     assert_eq!(perp_market.amm.base_asset_amount_per_lp, -574054756000);
 
@@ -405,7 +393,6 @@ fn amm_split_large_k_with_rebase() {
     assert_eq!(existing_position.per_lp_base, perp_market.amm.per_lp_base);
 
     assert_eq!(existing_position.base_asset_amount, -900000000);
-    assert_eq!(existing_position.remainder_base_asset_amount, -64680522);
     assert_eq!(existing_position.quote_asset_amount, 22168904); // out of favor rounding... :/
     assert_eq!(
         existing_position.last_base_asset_amount_per_lp,
@@ -422,7 +409,6 @@ fn full_lp_split() {
     let delta = PositionDelta {
         base_asset_amount: 10 * BASE_PRECISION_I64,
         quote_asset_amount: -10 * BASE_PRECISION_I64,
-        remainder_base_asset_amount: None,
     };
 
     let amm = AMM {
@@ -458,7 +444,6 @@ fn half_half_amm_lp_split() {
     let delta = PositionDelta {
         base_asset_amount: 10 * BASE_PRECISION_I64,
         quote_asset_amount: -10 * BASE_PRECISION_I64,
-        remainder_base_asset_amount: None,
     };
 
     let amm = AMM {
@@ -490,7 +475,6 @@ fn test_position_entry_sim() {
     let position_delta = PositionDelta {
         base_asset_amount: BASE_PRECISION_I64 / 2,
         quote_asset_amount: -99_345_000 / 2,
-        remainder_base_asset_amount: None,
     };
     let mut market = PerpMarket {
         amm: AMM {
@@ -512,7 +496,6 @@ fn test_position_entry_sim() {
     let position_delta_to_reduce = PositionDelta {
         base_asset_amount: -BASE_PRECISION_I64 / 5,
         quote_asset_amount: 99_245_000 / 5,
-        remainder_base_asset_amount: None,
     };
 
     let pnl = update_position_and_market(
@@ -530,7 +513,6 @@ fn test_position_entry_sim() {
     let position_delta_to_flip = PositionDelta {
         base_asset_amount: -BASE_PRECISION_I64,
         quote_asset_amount: 99_345_000,
-        remainder_base_asset_amount: None,
     };
 
     let pnl =
@@ -549,7 +531,6 @@ fn increase_long_from_no_position() {
     let position_delta = PositionDelta {
         base_asset_amount: 1,
         quote_asset_amount: -1,
-        remainder_base_asset_amount: None,
     };
     let mut market = PerpMarket {
         amm: AMM {
@@ -589,7 +570,6 @@ fn increase_short_from_no_position() {
     let position_delta = PositionDelta {
         base_asset_amount: -1,
         quote_asset_amount: 1,
-        remainder_base_asset_amount: None,
     };
     let mut market = PerpMarket {
         amm: AMM {
@@ -633,7 +613,6 @@ fn increase_long() {
     let position_delta = PositionDelta {
         base_asset_amount: 1,
         quote_asset_amount: -1,
-        remainder_base_asset_amount: None,
     };
     let mut market = PerpMarket {
         amm: AMM {
@@ -685,7 +664,6 @@ fn increase_short() {
     let position_delta = PositionDelta {
         base_asset_amount: -1,
         quote_asset_amount: 1,
-        remainder_base_asset_amount: None,
     };
     let mut market = PerpMarket {
         amm: AMM {
@@ -734,7 +712,6 @@ fn reduce_long_profitable() {
     let position_delta = PositionDelta {
         base_asset_amount: -1,
         quote_asset_amount: 5,
-        remainder_base_asset_amount: None,
     };
     let mut market = PerpMarket {
         amm: AMM {
@@ -785,7 +762,6 @@ fn reduce_long_unprofitable() {
     let position_delta = PositionDelta {
         base_asset_amount: -1,
         quote_asset_amount: 5,
-        remainder_base_asset_amount: None,
     };
     let mut market = PerpMarket {
         amm: AMM {
@@ -836,7 +812,6 @@ fn flip_long_to_short_profitable() {
     let position_delta = PositionDelta {
         base_asset_amount: -11,
         quote_asset_amount: 22,
-        remainder_base_asset_amount: None,
     };
     let mut market = PerpMarket {
         amm: AMM {
@@ -888,7 +863,6 @@ fn flip_long_to_short_unprofitable() {
     let position_delta = PositionDelta {
         base_asset_amount: -11,
         quote_asset_amount: 10,
-        remainder_base_asset_amount: None,
     };
     let mut market = PerpMarket {
         amm: AMM {
@@ -941,7 +915,6 @@ fn reduce_short_profitable() {
     let position_delta = PositionDelta {
         base_asset_amount: 1,
         quote_asset_amount: -5,
-        remainder_base_asset_amount: None,
     };
     let mut market = PerpMarket {
         amm: AMM {
@@ -990,7 +963,6 @@ fn decrease_short_unprofitable() {
     let position_delta = PositionDelta {
         base_asset_amount: 1,
         quote_asset_amount: -15,
-        remainder_base_asset_amount: None,
     };
     let mut market = PerpMarket {
         amm: AMM {
@@ -1039,7 +1011,6 @@ fn flip_short_to_long_profitable() {
     let position_delta = PositionDelta {
         base_asset_amount: 11,
         quote_asset_amount: -60,
-        remainder_base_asset_amount: None,
     };
     let mut market = PerpMarket {
         amm: AMM {
@@ -1091,7 +1062,6 @@ fn flip_short_to_long_unprofitable() {
     let position_delta = PositionDelta {
         base_asset_amount: 11,
         quote_asset_amount: -120,
-        remainder_base_asset_amount: None,
     };
     let mut market = PerpMarket {
         amm: AMM {
@@ -1143,7 +1113,6 @@ fn close_long_profitable() {
     let position_delta = PositionDelta {
         base_asset_amount: -10,
         quote_asset_amount: 15,
-        remainder_base_asset_amount: None,
     };
     let mut market = PerpMarket {
         amm: AMM {
@@ -1194,7 +1163,6 @@ fn close_long_unprofitable() {
     let position_delta = PositionDelta {
         base_asset_amount: -10,
         quote_asset_amount: 5,
-        remainder_base_asset_amount: None,
     };
     let mut market = PerpMarket {
         amm: AMM {
@@ -1244,7 +1212,6 @@ fn close_short_profitable() {
     let position_delta = PositionDelta {
         base_asset_amount: 10,
         quote_asset_amount: -5,
-        remainder_base_asset_amount: None,
     };
     let mut market = PerpMarket {
         amm: AMM {
@@ -1292,7 +1259,6 @@ fn close_short_unprofitable() {
     let position_delta = PositionDelta {
         base_asset_amount: 10,
         quote_asset_amount: -15,
-        remainder_base_asset_amount: None,
     };
     let mut market = PerpMarket {
         amm: AMM {
@@ -1340,7 +1306,6 @@ fn close_long_with_quote_break_even_amount_less_than_quote_asset_amount() {
     let position_delta = PositionDelta {
         base_asset_amount: -10,
         quote_asset_amount: 5,
-        remainder_base_asset_amount: None,
     };
     let mut market = PerpMarket {
         amm: AMM {
@@ -1391,7 +1356,6 @@ fn close_short_with_quote_break_even_amount_more_than_quote_asset_amount() {
     let position_delta = PositionDelta {
         base_asset_amount: 10,
         quote_asset_amount: -15,
-        remainder_base_asset_amount: None,
     };
     let mut market = PerpMarket {
         amm: AMM {

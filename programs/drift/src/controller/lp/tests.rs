@@ -171,7 +171,6 @@ fn test_partial_short_settle() {
 
     assert_eq!(position.base_asset_amount, -9);
     assert_eq!(position.quote_asset_amount, 10);
-    assert_eq!(position.remainder_base_asset_amount, -1);
     assert_eq!(position.last_base_asset_amount_per_lp, -10);
     assert_eq!(position.last_quote_asset_amount_per_lp, 10);
 
@@ -205,7 +204,6 @@ fn test_partial_long_settle() {
 
     assert_eq!(position.base_asset_amount, -9);
     assert_eq!(position.quote_asset_amount, 10);
-    assert_eq!(position.remainder_base_asset_amount, -1);
     assert_eq!(position.last_base_asset_amount_per_lp, -10);
     assert_eq!(position.last_quote_asset_amount_per_lp, 10);
 }
@@ -239,7 +237,6 @@ fn test_remainder_long_settle_too_large_order_step_size() {
     assert_eq!(position.last_quote_asset_amount_per_lp, -10);
     assert_eq!(position.base_asset_amount, 0);
     assert_eq!(position.quote_asset_amount, -10);
-    assert_eq!(position.remainder_base_asset_amount, 10);
     assert_eq!(market.amm.base_asset_amount_with_unsettled_lp, -10);
     // net baa doesnt change after settle_lp_position
     assert_eq!(market.amm.base_asset_amount_with_amm, 10);
@@ -252,7 +249,6 @@ fn test_remainder_long_settle_too_large_order_step_size() {
     assert_eq!(og_market.amm.sqrt_k, market.amm.sqrt_k);
     assert_eq!(position.quote_asset_amount, -11);
     assert_eq!(position.base_asset_amount, 0);
-    assert_eq!(position.remainder_base_asset_amount, 0);
 }
 
 #[test]
@@ -285,7 +281,6 @@ fn test_remainder_overflows_too_large_order_step_size() {
     assert_eq!(position.last_quote_asset_amount_per_lp, -10);
     assert_eq!(position.base_asset_amount, 0);
     assert_eq!(position.quote_asset_amount, -10);
-    assert_eq!(position.remainder_base_asset_amount, 10);
     assert_eq!(market.amm.base_asset_amount_with_unsettled_lp, -10);
     // net baa doesnt change after settle_lp_position
     assert_eq!(market.amm.base_asset_amount_with_amm, 10);
@@ -302,11 +297,7 @@ fn test_remainder_overflows_too_large_order_step_size() {
     assert_eq!(position.last_quote_asset_amount_per_lp, -16900000010);
     assert_eq!(position.quote_asset_amount, -16900000010);
     assert_eq!(position.base_asset_amount, 0);
-    assert_eq!(position.remainder_base_asset_amount, 1000000011);
-    assert_eq!(
-        (position.remainder_base_asset_amount as u64) < market.amm.order_step_size,
-        true
-    );
+    
 
     // might break i32 limit
     market.amm.base_asset_amount_per_lp = 3 * BASE_PRECISION_I128 + 1;
@@ -321,11 +312,7 @@ fn test_remainder_overflows_too_large_order_step_size() {
     // assert_eq!(position.last_quote_asset_amount_per_lp, -16900000000);
     assert_eq!(position.quote_asset_amount, -16900000010);
     assert_eq!(position.base_asset_amount, 0);
-    // assert_eq!(position.remainder_base_asset_amount, 1000000001);
-    assert_eq!(
-        (position.remainder_base_asset_amount as u64) < market.amm.order_step_size,
-        true
-    );
+    
 
     // past order_step_size on market
     market.amm.base_asset_amount_per_lp = 5 * BASE_PRECISION_I128 + 1;
@@ -344,11 +331,7 @@ fn test_remainder_overflows_too_large_order_step_size() {
     assert_eq!(position.last_quote_asset_amount_per_lp, -116900000000);
     assert_eq!(position.quote_asset_amount, -116900000000);
     assert_eq!(position.base_asset_amount, 5000000000);
-    assert_eq!(position.remainder_base_asset_amount, 1);
-    assert_eq!(
-        (position.remainder_base_asset_amount as u64) < market.amm.order_step_size,
-        true
-    );
+    
 
     // burn
     let lp_shares = position.lp_shares;
@@ -358,7 +341,6 @@ fn test_remainder_overflows_too_large_order_step_size() {
     assert_eq!(og_market.amm.sqrt_k, market.amm.sqrt_k);
     assert_eq!(position.quote_asset_amount, -116900000001);
     assert_eq!(position.base_asset_amount, 5000000000);
-    assert_eq!(position.remainder_base_asset_amount, 0);
 
     assert_eq!(market.amm.base_asset_amount_with_amm, 0);
     assert_eq!(market.amm.base_asset_amount_with_unsettled_lp, 0);
@@ -395,7 +377,6 @@ fn test_remainder_burn_large_order_step_size() {
     assert_eq!(position.last_quote_asset_amount_per_lp, -10);
     assert_eq!(position.base_asset_amount, 0);
     assert_eq!(position.quote_asset_amount, -10);
-    assert_eq!(position.remainder_base_asset_amount, 10);
     assert_eq!(market.amm.base_asset_amount_with_unsettled_lp, -10);
     // net baa doesnt change after settle_lp_position
     assert_eq!(market.amm.base_asset_amount_with_amm, 10);
@@ -411,11 +392,7 @@ fn test_remainder_burn_large_order_step_size() {
     assert_eq!(position.last_quote_asset_amount_per_lp, -16900000000);
     assert_eq!(position.quote_asset_amount, -16900000000);
     assert_eq!(position.base_asset_amount, 0);
-    assert_eq!(position.remainder_base_asset_amount, 1000000001);
-    assert_eq!(
-        (position.remainder_base_asset_amount as u64) < market.amm.order_step_size,
-        true
-    );
+    
 
     // burn with overflowed remainder
     let lp_shares = position.lp_shares;
@@ -425,7 +402,6 @@ fn test_remainder_burn_large_order_step_size() {
     assert_eq!(og_market.amm.sqrt_k, market.amm.sqrt_k);
     assert_eq!(position.quote_asset_amount, -16900000023);
     assert_eq!(position.base_asset_amount, 0);
-    assert_eq!(position.remainder_base_asset_amount, 0);
 }
 
 #[test]
@@ -808,7 +784,6 @@ fn test_lp_has_correct_entry_be_price() {
     settle_lp_position(&mut position, &mut market).unwrap();
     assert_eq!(position.get_entry_price().unwrap(), 99999822);
 
-    assert_eq!(position.remainder_base_asset_amount, 0);
     assert_eq!(position.quote_entry_amount, -49999911);
     assert_eq!(position.quote_break_even_amount, -49999911);
     assert_eq!(position.quote_asset_amount, -2000000);
@@ -832,7 +807,6 @@ fn test_lp_has_correct_entry_be_price() {
     assert_eq!(position.get_cost_basis().unwrap(), -75833183);
 
     assert_eq!(position.base_asset_amount, 300000000);
-    assert_eq!(position.remainder_base_asset_amount, -50000000);
     assert_eq!(position.quote_entry_amount, -24999956);
     assert_eq!(position.quote_break_even_amount, -24999956);
     assert_eq!(position.quote_asset_amount, 22749955);
@@ -863,7 +837,6 @@ fn test_lp_has_correct_entry_be_price_sim_no_remainders() {
     assert_eq!(position.get_entry_price().unwrap(), 0);
     assert_eq!(position.get_cost_basis().unwrap(), 0);
     assert_eq!(position.get_breakeven_price().unwrap(), 0);
-    assert_eq!(position.remainder_base_asset_amount, 0);
     assert_eq!(position.base_asset_amount, 0);
     let mut num_position_flips = 0;
     let mut flip_indexes: Vec<i128> = Vec::new();
@@ -903,10 +876,7 @@ fn test_lp_has_correct_entry_be_price_sim_no_remainders() {
         let be = position.get_breakeven_price().unwrap();
         let cb = position.get_cost_basis().unwrap();
 
-        let iii = position
-            .base_asset_amount
-            .safe_add(position.remainder_base_asset_amount as i64)
-            .unwrap();
+        let iii = position.base_asset_amount.unwrap();
         msg!(
             "{}: entry: {}, be: {} cb:{} ({}/{})",
             i,
@@ -916,9 +886,8 @@ fn test_lp_has_correct_entry_be_price_sim_no_remainders() {
             iii,
             position.base_asset_amount,
         );
-        assert_eq!(position.remainder_base_asset_amount, 0);
 
-        if position.get_base_asset_amount_with_remainder_abs().unwrap() != 0 {
+        if position.get_base_asset_amount_i128_abs().unwrap() != 0 {
             assert!(entry <= 100 * PRICE_PRECISION as i128);
             assert!(entry >= 99 * PRICE_PRECISION as i128);
         }
@@ -959,7 +928,6 @@ fn test_lp_remainder_position_updates() {
     let position_delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(880),
     };
 
     let pnl: i64 = update_position_and_market(&mut position, &mut market, &position_delta).unwrap();
@@ -968,13 +936,11 @@ fn test_lp_remainder_position_updates() {
     let position_delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(-881),
     };
 
     let pnl: i64 = update_position_and_market(&mut position, &mut market, &position_delta).unwrap();
     assert_eq!(pnl, 0);
     assert_eq!(position.base_asset_amount, 0);
-    assert_eq!(position.remainder_base_asset_amount, -1);
     crate::validation::perp_market::validate_perp_market(&market).unwrap();
     crate::validation::position::validate_perp_position_with_perp_market(&position, &market)
         .unwrap();
@@ -982,13 +948,11 @@ fn test_lp_remainder_position_updates() {
     let position_delta = PositionDelta {
         quote_asset_amount: -199 * 1000000,
         base_asset_amount: BASE_PRECISION_I64,
-        remainder_base_asset_amount: Some(-BASE_PRECISION_I64 / 22),
     };
 
     let pnl: i64 = update_position_and_market(&mut position, &mut market, &position_delta).unwrap();
     assert_eq!(pnl, 0);
     assert_eq!(position.base_asset_amount, 1000000000);
-    assert_eq!(position.remainder_base_asset_amount, -45454546);
 
     crate::validation::perp_market::validate_perp_market(&market).unwrap();
     crate::validation::position::validate_perp_position_with_perp_market(&position, &market)
@@ -997,13 +961,11 @@ fn test_lp_remainder_position_updates() {
     let position_delta = PositionDelta {
         quote_asset_amount: 199 * 1000000,
         base_asset_amount: -BASE_PRECISION_I64 * 2,
-        remainder_base_asset_amount: Some(BASE_PRECISION_I64 / 23),
     };
 
     let pnl: i64 = update_position_and_market(&mut position, &mut market, &position_delta).unwrap();
     assert_eq!(pnl, -101912122);
     assert_eq!(position.base_asset_amount, -1000000000);
-    assert_eq!(position.remainder_base_asset_amount, -1976286);
 
     crate::validation::perp_market::validate_perp_market(&market).unwrap();
     crate::validation::position::validate_perp_position_with_perp_market(&position, &market)
@@ -1034,7 +996,6 @@ fn test_lp_remainder_position_updates_2() {
     let position_delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 300000000,
-        remainder_base_asset_amount: Some(33333333),
     };
 
     let pnl: i64 = update_position_and_market(&mut position, &mut market, &position_delta).unwrap();
@@ -1047,13 +1008,11 @@ fn test_lp_remainder_position_updates_2() {
     let position_delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 500000000,
-        remainder_base_asset_amount: Some(0),
     };
 
     let pnl: i64 = update_position_and_market(&mut position, &mut market, &position_delta).unwrap();
     assert_eq!(pnl, 0);
     assert_eq!(position.base_asset_amount, 800000000);
-    assert_eq!(position.remainder_base_asset_amount, 33333333);
     crate::validation::perp_market::validate_perp_market(&market).unwrap();
     crate::validation::position::validate_perp_position_with_perp_market(&position, &market)
         .unwrap();
@@ -1061,13 +1020,11 @@ fn test_lp_remainder_position_updates_2() {
     let position_delta = PositionDelta {
         quote_asset_amount: 199 * 10000,
         base_asset_amount: -300000000,
-        remainder_base_asset_amount: Some(-63636363),
     };
 
     let pnl: i64 = update_position_and_market(&mut position, &mut market, &position_delta).unwrap();
     assert_eq!(pnl, 1990000);
     assert_eq!(position.base_asset_amount, 500000000);
-    assert_eq!(position.remainder_base_asset_amount, -30303030);
     assert_eq!(market.amm.base_asset_amount_long, 500000000);
     assert_eq!(market.amm.base_asset_amount_short, 0);
     assert_eq!(market.amm.base_asset_amount_with_unsettled_lp, 500000000);
@@ -1103,7 +1060,6 @@ fn test_lp_has_correct_entry_be_price_sim() {
     assert_eq!(position.get_entry_price().unwrap(), 0);
     assert_eq!(position.get_cost_basis().unwrap(), 0);
     assert_eq!(position.get_breakeven_price().unwrap(), 0);
-    assert_eq!(position.remainder_base_asset_amount, 0);
     assert_eq!(position.base_asset_amount, 0);
     let mut num_position_flips = 0;
     let mut flip_indexes: Vec<i128> = Vec::new();
@@ -1186,10 +1142,7 @@ fn test_lp_has_correct_entry_be_price_sim() {
         let be = position.get_breakeven_price().unwrap();
         let cb = position.get_cost_basis().unwrap();
 
-        let iii = position
-            .base_asset_amount
-            .safe_add(position.remainder_base_asset_amount as i64)
-            .unwrap();
+        let iii = position.base_asset_amount.unwrap();
         msg!(
             "{}: entry: {}, be: {} cb:{} ({}/{})",
             i,
@@ -1199,9 +1152,8 @@ fn test_lp_has_correct_entry_be_price_sim() {
             iii,
             position.base_asset_amount,
         );
-        // assert_ne!(position.remainder_base_asset_amount, 0);
 
-        if position.get_base_asset_amount_with_remainder_abs().unwrap() != 0 {
+        if position.get_base_asset_amount_i128_abs().unwrap() != 0 {
             assert!(entry <= 100 * PRICE_PRECISION as i128);
             assert!(entry >= 99 * PRICE_PRECISION as i128);
         }
@@ -1243,7 +1195,6 @@ fn test_lp_has_correct_entry_be_price_sim_more_flips() {
     assert_eq!(position.get_entry_price().unwrap(), 0);
     assert_eq!(position.get_cost_basis().unwrap(), 0);
     assert_eq!(position.get_breakeven_price().unwrap(), 0);
-    assert_eq!(position.remainder_base_asset_amount, 0);
     assert_eq!(position.base_asset_amount, 0);
     let mut num_position_flips = 0;
     let mut flip_indexes: Vec<i128> = Vec::new();
@@ -1278,16 +1229,12 @@ fn test_lp_has_correct_entry_be_price_sim_more_flips() {
             num_position_flips += 1;
             flip_indexes.push(i);
         }
-        assert_eq!(position.remainder_base_asset_amount, 0);
 
         let entry = position.get_entry_price().unwrap();
         let be = position.get_breakeven_price().unwrap();
         let cb = position.get_cost_basis().unwrap();
 
-        let iii = position
-            .base_asset_amount
-            .safe_add(position.remainder_base_asset_amount as i64)
-            .unwrap();
+        let iii = position.base_asset_amount.unwrap();
         msg!(
             "{}: entry: {}, be: {} cb:{} ({}/{})",
             i,
@@ -1298,7 +1245,7 @@ fn test_lp_has_correct_entry_be_price_sim_more_flips() {
             position.base_asset_amount,
         );
 
-        if position.get_base_asset_amount_with_remainder_abs().unwrap() != 0 {
+        if position.get_base_asset_amount_i128_abs().unwrap() != 0 {
             assert!(entry <= 99_800_000_i128);
             assert!(entry >= 99_199_820_i128);
         }
@@ -1312,7 +1259,6 @@ fn test_lp_has_correct_entry_be_price_sim_more_flips() {
     let cb = position.get_cost_basis().unwrap();
 
     assert_eq!(position.base_asset_amount, 150200000000);
-    assert_eq!(position.remainder_base_asset_amount, 0);
 
     assert_eq!(entry, 99199822);
     assert_eq!(be, 99199822);
@@ -1329,7 +1275,6 @@ fn test_get_position_update_type_lp_opens() {
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(0),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1343,7 +1288,6 @@ fn test_get_position_update_type_lp_opens() {
     let delta = PositionDelta {
         quote_asset_amount: 10000,
         base_asset_amount: -898989,
-        remainder_base_asset_amount: Some(0),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1353,7 +1297,6 @@ fn test_get_position_update_type_lp_opens() {
     let delta = PositionDelta {
         quote_asset_amount: 10000,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(0),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1363,7 +1306,6 @@ fn test_get_position_update_type_lp_opens() {
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(1000),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1373,7 +1315,6 @@ fn test_get_position_update_type_lp_opens() {
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(-88881000),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1383,7 +1324,6 @@ fn test_get_position_update_type_lp_opens() {
     let delta = PositionDelta {
         quote_asset_amount: 1899990,
         base_asset_amount: -8989898,
-        remainder_base_asset_amount: Some(-88881000),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1409,7 +1349,6 @@ fn test_get_position_update_type_lp_negative_position() {
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(0),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1419,7 +1358,6 @@ fn test_get_position_update_type_lp_negative_position() {
     let delta = PositionDelta {
         quote_asset_amount: 10000,
         base_asset_amount: -898989,
-        remainder_base_asset_amount: Some(0),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1429,7 +1367,6 @@ fn test_get_position_update_type_lp_negative_position() {
     let delta = PositionDelta {
         quote_asset_amount: 10000,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(0),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1439,7 +1376,6 @@ fn test_get_position_update_type_lp_negative_position() {
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(1000),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1449,7 +1385,6 @@ fn test_get_position_update_type_lp_negative_position() {
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(-88881000),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1459,7 +1394,6 @@ fn test_get_position_update_type_lp_negative_position() {
     let delta = PositionDelta {
         quote_asset_amount: 1899990,
         base_asset_amount: -8989898,
-        remainder_base_asset_amount: Some(-88881000),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1470,7 +1404,6 @@ fn test_get_position_update_type_lp_negative_position() {
     let delta = PositionDelta {
         quote_asset_amount: -88888,
         base_asset_amount: 81,
-        remainder_base_asset_amount: Some(-81000),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1481,7 +1414,6 @@ fn test_get_position_update_type_lp_negative_position() {
     let delta = PositionDelta {
         quote_asset_amount: -88888,
         base_asset_amount: 81000,
-        remainder_base_asset_amount: Some(-81),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1507,7 +1439,6 @@ fn test_get_position_update_type_lp_positive_position() {
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(0),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1517,7 +1448,6 @@ fn test_get_position_update_type_lp_positive_position() {
     let delta = PositionDelta {
         quote_asset_amount: 10000,
         base_asset_amount: -898989,
-        remainder_base_asset_amount: Some(0),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1527,7 +1457,6 @@ fn test_get_position_update_type_lp_positive_position() {
     let delta = PositionDelta {
         quote_asset_amount: 10000,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(0),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1537,7 +1466,6 @@ fn test_get_position_update_type_lp_positive_position() {
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(1000),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1547,7 +1475,6 @@ fn test_get_position_update_type_lp_positive_position() {
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(-88881000),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1557,7 +1484,6 @@ fn test_get_position_update_type_lp_positive_position() {
     let delta = PositionDelta {
         quote_asset_amount: 1899990,
         base_asset_amount: -8989898,
-        remainder_base_asset_amount: Some(-88881000),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1568,7 +1494,6 @@ fn test_get_position_update_type_lp_positive_position() {
     let delta = PositionDelta {
         quote_asset_amount: -88888,
         base_asset_amount: 81,
-        remainder_base_asset_amount: Some(-81000),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1579,7 +1504,6 @@ fn test_get_position_update_type_lp_positive_position() {
     let delta = PositionDelta {
         quote_asset_amount: -88888,
         base_asset_amount: 81000,
-        remainder_base_asset_amount: Some(-81),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1592,7 +1516,6 @@ fn test_get_position_update_type_lp_positive_position_with_positive_remainder() 
     // $119 long
     let position = PerpPosition {
         base_asset_amount: 1000000000 * 2,
-        remainder_base_asset_amount: 7809809,
         quote_asset_amount: -119000000 * 2,
         quote_entry_amount: -119000000 * 2,
         quote_break_even_amount: -119000000 * 2,
@@ -1606,7 +1529,6 @@ fn test_get_position_update_type_lp_positive_position_with_positive_remainder() 
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: -1000000001 * 2,
-        remainder_base_asset_amount: Some(0),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1616,7 +1538,6 @@ fn test_get_position_update_type_lp_positive_position_with_positive_remainder() 
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(-7809809),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1626,7 +1547,6 @@ fn test_get_position_update_type_lp_positive_position_with_positive_remainder() 
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: -1000000000 * 2,
-        remainder_base_asset_amount: Some(-7809809 - 1),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1636,7 +1556,6 @@ fn test_get_position_update_type_lp_positive_position_with_positive_remainder() 
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(0),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1646,7 +1565,6 @@ fn test_get_position_update_type_lp_positive_position_with_positive_remainder() 
     let delta = PositionDelta {
         quote_asset_amount: 10000,
         base_asset_amount: -898989,
-        remainder_base_asset_amount: Some(0),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1656,7 +1574,6 @@ fn test_get_position_update_type_lp_positive_position_with_positive_remainder() 
     let delta = PositionDelta {
         quote_asset_amount: 10000,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(0),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1666,7 +1583,6 @@ fn test_get_position_update_type_lp_positive_position_with_positive_remainder() 
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(1000),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1676,7 +1592,6 @@ fn test_get_position_update_type_lp_positive_position_with_positive_remainder() 
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(-88881000),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1686,7 +1601,6 @@ fn test_get_position_update_type_lp_positive_position_with_positive_remainder() 
     let delta = PositionDelta {
         quote_asset_amount: 1899990,
         base_asset_amount: -8989898,
-        remainder_base_asset_amount: Some(-88881000),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1697,7 +1611,6 @@ fn test_get_position_update_type_lp_positive_position_with_positive_remainder() 
     let delta = PositionDelta {
         quote_asset_amount: -88888,
         base_asset_amount: 81,
-        remainder_base_asset_amount: Some(-81000),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1708,7 +1621,6 @@ fn test_get_position_update_type_lp_positive_position_with_positive_remainder() 
     let delta = PositionDelta {
         quote_asset_amount: -88888,
         base_asset_amount: 81000,
-        remainder_base_asset_amount: Some(-81),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1721,7 +1633,6 @@ fn test_get_position_update_type_positive_remainder() {
     // $119 long (only a remainder size)
     let position = PerpPosition {
         base_asset_amount: 0,
-        remainder_base_asset_amount: 7809809,
         quote_asset_amount: -119000000 * 7809809 / BASE_PRECISION_I64,
         quote_entry_amount: -119000000 * 7809809 / BASE_PRECISION_I64,
         quote_break_even_amount: -119000000 * 7809809 / BASE_PRECISION_I64,
@@ -1735,7 +1646,6 @@ fn test_get_position_update_type_positive_remainder() {
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: -1000000001 * 2,
-        remainder_base_asset_amount: Some(0),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1745,7 +1655,6 @@ fn test_get_position_update_type_positive_remainder() {
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(1),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1755,7 +1664,6 @@ fn test_get_position_update_type_positive_remainder() {
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(-8791),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1765,7 +1673,6 @@ fn test_get_position_update_type_positive_remainder() {
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(-7809809),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1775,7 +1682,6 @@ fn test_get_position_update_type_positive_remainder() {
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: 0,
-        remainder_base_asset_amount: Some(-7809809 - 1),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1785,7 +1691,6 @@ fn test_get_position_update_type_positive_remainder() {
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: -1000000000 * 2,
-        remainder_base_asset_amount: Some(-7809809 - 1),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1795,7 +1700,6 @@ fn test_get_position_update_type_positive_remainder() {
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: -1000000000 * 2,
-        remainder_base_asset_amount: Some(0),
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),
@@ -1805,7 +1709,6 @@ fn test_get_position_update_type_positive_remainder() {
     let delta = PositionDelta {
         quote_asset_amount: 0,
         base_asset_amount: -1000000000 * 2,
-        remainder_base_asset_amount: None,
     };
     assert_eq!(
         get_position_update_type(&position, &delta).unwrap(),

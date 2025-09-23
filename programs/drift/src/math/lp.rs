@@ -26,23 +26,14 @@ mod tests;
 pub struct LPMetrics {
     pub base_asset_amount: i128,
     pub quote_asset_amount: i128,
-    pub remainder_base_asset_amount: i128,
 }
 
 pub fn calculate_settle_lp_metrics(amm: &AMM, position: &PerpPosition) -> DriftResult<LPMetrics> {
     let (base_asset_amount, quote_asset_amount) = calculate_settled_lp_base_quote(amm, position)?;
 
-    // stepsize it
-    let (standardized_base_asset_amount, remainder_base_asset_amount) =
-        standardize_base_asset_amount_with_remainder_i128(
-            base_asset_amount,
-            amm.order_step_size.cast()?,
-        )?;
-
     let lp_metrics = LPMetrics {
-        base_asset_amount: standardized_base_asset_amount,
+        base_asset_amount,
         quote_asset_amount,
-        remainder_base_asset_amount: remainder_base_asset_amount.cast()?,
     };
 
     Ok(lp_metrics)

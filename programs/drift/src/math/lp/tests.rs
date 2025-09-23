@@ -203,7 +203,6 @@ mod calculate_settle_lp_metrics {
 
         assert_eq!(lp_metrics.base_asset_amount, 10 * 100);
         assert_eq!(lp_metrics.quote_asset_amount, -10 * 100);
-        assert_eq!(lp_metrics.remainder_base_asset_amount, 0);
     }
 
     #[test]
@@ -224,7 +223,6 @@ mod calculate_settle_lp_metrics {
 
         assert_eq!(lp_metrics.base_asset_amount, 0);
         assert_eq!(lp_metrics.quote_asset_amount, -10 * 100);
-        assert_eq!(lp_metrics.remainder_base_asset_amount, 10 * 100);
     }
 
     #[test]
@@ -245,7 +243,6 @@ mod calculate_settle_lp_metrics {
 
         assert_eq!(lp_metrics.base_asset_amount, 9);
         assert_eq!(lp_metrics.quote_asset_amount, -10);
-        assert_eq!(lp_metrics.remainder_base_asset_amount, 1);
     }
 }
 
