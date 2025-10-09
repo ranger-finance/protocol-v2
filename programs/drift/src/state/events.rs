@@ -253,10 +253,15 @@ pub struct OrderActionRecord {
     /// precision: BASE_PRECISION
     /// Only Some if the maker flipped position direction
     pub maker_existing_base_asset_amount: Option<u64>,
+    /// precision: PRICE_PRECISION
+    pub trigger_price: Option<u64>,
+    pub builder_idx: Option<u8>,
+    /// precision: QUOTE_PRECISION
+    pub builder_fee: Option<u64>,
 }
 
 impl Size for OrderActionRecord {
-    const SIZE: usize = 448;
+    const SIZE: usize = 468;
 }
 
 pub fn get_order_action_record(
@@ -284,6 +289,9 @@ pub fn get_order_action_record(
     taker_existing_base_asset_amount: Option<u64>,
     maker_existing_quote_entry_amount: Option<u64>,
     maker_existing_base_asset_amount: Option<u64>,
+    trigger_price: Option<u64>,
+    builder_idx: Option<u8>,
+    builder_fee: Option<u64>,
 ) -> DriftResult<OrderActionRecord> {
     Ok(OrderActionRecord {
         ts,
@@ -336,6 +344,9 @@ pub fn get_order_action_record(
         taker_existing_base_asset_amount,
         maker_existing_quote_entry_amount,
         maker_existing_base_asset_amount,
+        trigger_price,
+        builder_idx,
+        builder_fee,
     })
 }
 

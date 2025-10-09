@@ -621,6 +621,9 @@ pub fn liquidate_perp(
         taker_existing_base_asset_amount: None,
         maker_existing_quote_entry_amount: None,
         maker_existing_base_asset_amount: None,
+        trigger_price: None,
+        builder_idx: None,
+        builder_fee: None,
     };
     emit!(fill_record);
 

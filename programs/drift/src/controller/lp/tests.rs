@@ -297,7 +297,6 @@ fn test_remainder_overflows_too_large_order_step_size() {
     assert_eq!(position.last_quote_asset_amount_per_lp, -16900000010);
     assert_eq!(position.quote_asset_amount, -16900000010);
     assert_eq!(position.base_asset_amount, 0);
-    
 
     // might break i32 limit
     market.amm.base_asset_amount_per_lp = 3 * BASE_PRECISION_I128 + 1;
@@ -312,7 +311,6 @@ fn test_remainder_overflows_too_large_order_step_size() {
     // assert_eq!(position.last_quote_asset_amount_per_lp, -16900000000);
     assert_eq!(position.quote_asset_amount, -16900000010);
     assert_eq!(position.base_asset_amount, 0);
-    
 
     // past order_step_size on market
     market.amm.base_asset_amount_per_lp = 5 * BASE_PRECISION_I128 + 1;
@@ -331,7 +329,6 @@ fn test_remainder_overflows_too_large_order_step_size() {
     assert_eq!(position.last_quote_asset_amount_per_lp, -116900000000);
     assert_eq!(position.quote_asset_amount, -116900000000);
     assert_eq!(position.base_asset_amount, 5000000000);
-    
 
     // burn
     let lp_shares = position.lp_shares;
@@ -392,7 +389,6 @@ fn test_remainder_burn_large_order_step_size() {
     assert_eq!(position.last_quote_asset_amount_per_lp, -16900000000);
     assert_eq!(position.quote_asset_amount, -16900000000);
     assert_eq!(position.base_asset_amount, 0);
-    
 
     // burn with overflowed remainder
     let lp_shares = position.lp_shares;
@@ -876,7 +872,7 @@ fn test_lp_has_correct_entry_be_price_sim_no_remainders() {
         let be = position.get_breakeven_price().unwrap();
         let cb = position.get_cost_basis().unwrap();
 
-        let iii = position.base_asset_amount.unwrap();
+        let iii = position.base_asset_amount;
         msg!(
             "{}: entry: {}, be: {} cb:{} ({}/{})",
             i,
@@ -1142,7 +1138,7 @@ fn test_lp_has_correct_entry_be_price_sim() {
         let be = position.get_breakeven_price().unwrap();
         let cb = position.get_cost_basis().unwrap();
 
-        let iii = position.base_asset_amount.unwrap();
+        let iii = position.base_asset_amount;
         msg!(
             "{}: entry: {}, be: {} cb:{} ({}/{})",
             i,
@@ -1234,7 +1230,7 @@ fn test_lp_has_correct_entry_be_price_sim_more_flips() {
         let be = position.get_breakeven_price().unwrap();
         let cb = position.get_cost_basis().unwrap();
 
-        let iii = position.base_asset_amount.unwrap();
+        let iii = position.base_asset_amount;
         msg!(
             "{}: entry: {}, be: {} cb:{} ({}/{})",
             i,
