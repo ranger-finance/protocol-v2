@@ -813,15 +813,11 @@ pub struct AMM {
     /// precision: FUNDING_RATE_PRECISION
     pub last_funding_rate_long: i64,
     /// last funding rate for shorts in this perp market (unit is quote per base)
-    /// precision: FUNDING_RATE_PRECISION
+    /// precision: QUOTE_PRECISION
     pub last_funding_rate_short: i64,
     /// estimate of last 24h of funding rate perp market (unit is quote per base)
     /// precision: QUOTE_PRECISION
     pub last_24h_avg_funding_rate: i64,
-    /// MM oracle price
-    pub mm_oracle_price: i64,
-    /// last funding oracle twap
-    pub last_funding_oracle_twap: i64,
     /// total fees collected by this perp market
     /// precision: QUOTE_PRECISION
     pub total_fee: i128,
@@ -898,7 +894,6 @@ pub struct AMM {
     /// the max base size a single user can have
     /// precision: BASE_PRECISION
     pub mm_oracle_slot: u64,
-    pub mm_oracle_sequence_id: u64,
     /// estimated total of volume in market
     /// QUOTE_PRECISION
     pub volume_24h: u64,
@@ -924,6 +919,8 @@ pub struct AMM {
     pub long_spread: u32,
     /// the spread for bids vs the reserve price
     pub short_spread: u32,
+    /// MM oracle price
+    pub mm_oracle_price: i64,
     /// the fraction of total available liquidity a single fill on the AMM can consume
     pub max_fill_reserve_fraction: u16,
     /// the maximum slippage a single fill on the AMM can push
@@ -944,16 +941,19 @@ pub struct AMM {
     pub per_lp_base: i8,
     /// the override for the state.min_perp_auction_duration
     /// 0 is no override, -1 is disable speed bump, 1-100 is literal speed bump
-    pub taker_speed_bump_override: i8,
+    pub oracle_low_risk_slot_delay_override: i8,
     /// signed scale amm_spread similar to fee_adjustment logic (-100 = 0, 100 = double)
     pub amm_spread_adjustment: i8,
     pub oracle_slot_delay_override: i8,
+    pub mm_oracle_sequence_id: u64,
     pub net_unsettled_funding_pnl: i64,
     pub quote_asset_amount_with_unsettled_lp: i64,
     pub reference_price_offset: i32,
     /// signed scale amm_spread similar to fee_adjustment logic (-100 = 0, 100 = double)
     pub amm_inventory_spread_adjustment: i8,
-    pub padding: [u8; 3],
+    pub reference_price_offset_deadband_pct: u8,
+    pub padding: [u8; 2],
+    pub last_funding_oracle_twap: i64,
 }
 
 impl Default for AMM {
@@ -987,8 +987,6 @@ impl Default for AMM {
             last_funding_rate_long: 0,
             last_funding_rate_short: 0,
             last_24h_avg_funding_rate: 0,
-            mm_oracle_price: 0,
-            last_funding_oracle_twap: 0,
             total_fee: 0,
             total_mm_fee: 0,
             total_exchange_fee: 0,
@@ -1016,8 +1014,6 @@ impl Default for AMM {
             order_step_size: 0,
             order_tick_size: 0,
             min_order_size: 1,
-            mm_oracle_slot: 0,
-            mm_oracle_sequence_id: 0,
             volume_24h: 0,
             long_intensity_volume: 0,
             short_intensity_volume: 0,
@@ -1029,6 +1025,8 @@ impl Default for AMM {
             max_spread: 0,
             long_spread: 0,
             short_spread: 0,
+            mm_oracle_price: 0,
+            mm_oracle_slot: 0,
             max_fill_reserve_fraction: 0,
             max_slippage_ratio: 0,
             curve_update_intensity: 0,
@@ -1037,14 +1035,17 @@ impl Default for AMM {
             last_oracle_valid: false,
             target_base_asset_amount_per_lp: 0,
             per_lp_base: 0,
-            taker_speed_bump_override: 0,
+            oracle_low_risk_slot_delay_override: 0,
             amm_spread_adjustment: 0,
-            oracle_slot_delay_override: 0,
+            oracle_slot_delay_override: -1,
+            mm_oracle_sequence_id: 0,
             net_unsettled_funding_pnl: 0,
             quote_asset_amount_with_unsettled_lp: 0,
             reference_price_offset: 0,
             amm_inventory_spread_adjustment: 0,
-            padding: [0; 3],
+            reference_price_offset_deadband_pct: 0,
+            padding: [0; 2],
+            last_funding_oracle_twap: 0,
         }
     }
 }

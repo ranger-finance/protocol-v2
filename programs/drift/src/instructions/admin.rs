@@ -893,13 +893,14 @@ pub fn handle_initialize_perp_market(
             target_base_asset_amount_per_lp: 0,
             per_lp_base: 0,
             oracle_slot_delay_override: 0,
-            taker_speed_bump_override: 0,
+            oracle_low_risk_slot_delay_override: 0,
             amm_spread_adjustment: 0,
             net_unsettled_funding_pnl: 0,
             quote_asset_amount_with_unsettled_lp: 0,
             reference_price_offset: 0,
+            reference_price_offset_deadband_pct: 0,
             amm_inventory_spread_adjustment: 0,
-            padding: [0; 3],
+            padding: [0; 2],
         },
     };
 
